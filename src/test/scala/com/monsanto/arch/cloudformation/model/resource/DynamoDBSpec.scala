@@ -43,7 +43,8 @@ class DynamoDBSpec extends FunSpec with Matchers with JsonWritingMatcher {
       TableName = Some("Table1"),
       DeletionPolicy = Some(Retain),
       DependsOn = Some(Seq("myothertable")),
-      TimeToLiveSpecification = Some(TimeToLiveSpecification(AttributeName = "ttl", Enabled = true))
+      TimeToLiveSpecification = Some(TimeToLiveSpecification(AttributeName = "ttl", Enabled = true)),
+      Tags = Some(Seq(AmazonTag(Key = "Key", Value = "Value")))
     )
     val resource: Resource[`AWS::DynamoDB::Table`] = dynamoDbTable
 
@@ -102,7 +103,13 @@ class DynamoDBSpec extends FunSpec with Matchers with JsonWritingMatcher {
         |  "TimeToLiveSpecification": {
         |    "AttributeName": "ttl",
         |    "Enabled": true
-        |  }
+        |  },
+        |  "Tags": [
+        |    {
+        |      "Key": "Key",
+        |      "Value": "Value"
+        |    }
+        |  ]
         |  }
         |}
       """.stripMargin
