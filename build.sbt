@@ -58,24 +58,33 @@ enablePlugins(GhpagesPlugin, SiteScaladocPlugin)
 
 git.remoteRepo := "git@github.com:MonsantoCo/cloudformation-template-generator.git"
 
-// for bintray
-
-bintrayOrganization := Some("monsanto")
-
 licenses += ("BSD", url("http://opensource.org/licenses/BSD-3-Clause"))
 
-bintrayReleaseOnPublish := ! isSnapshot.value
+publishTo in ThisBuild := Some("maven" at "https://artifactory.nike.com/artifactory/maven")
+credentials in ThisBuild += Credentials(realm = "maven", host = "artifactory.nike.com", userName = "maven", passwd = "ludist")
+credentials in ThisBuild += Credentials(realm = "Artifactory Realm", host = "artifactory.nike.com", userName = "maven", passwd = "ludist")
+val sharedScalacOptions = Seq(
+  "-deprecation",
+  "-feature",
+  "-unchecked"
+)
+val releaseSettings = Seq(
+  resolvers ++= Seq(
+    "nike" at "https://artifactory.nike.com/artifactory/all-repos"
+  ),
+  organization := "com.nike.sim",
+  releaseCrossBuild := true,
+  scalacOptions ++= sharedScalacOptions ++ Seq("-Xlint", "-Xlint:-adapted-args"),
+  scalacOptions in(Compile, console) ++= sharedScalacOptions,
+  scalacOptions in(Compile, doc) ++= sharedScalacOptions,
+  publishTo := {
+    val repo = "https://artifactory.nike.com/artifactory/maven"
+    if (isSnapshot.value) {
+      Some("snapshots" at s"$repo-snapshots")
+    } else {
+      Some("releases" at repo)
+    }
+  },
+  credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
+)
 
-publishTo in ThisBuild := Def.taskDyn[Option[Resolver]] {
-  if (isSnapshot.value)
-    Def.task(Some("Artifactory Realm" at "https://oss.jfrog.org/oss-snapshot-local/"))
-  else
-    Def.task(publishTo.value) /* Value set by bintray-sbt plugin */
-}.value
-
-credentials := Def.taskDyn[Seq[Credentials]] {
-  if (isSnapshot.value)
-    Def.task(List(Path.userHome / ".bintray" / ".artifactory").filter(_.exists).map(Credentials(_)))
-  else
-    Def.task(credentials.value) /* Value set by bintray-sbt plugin */
-}.value
