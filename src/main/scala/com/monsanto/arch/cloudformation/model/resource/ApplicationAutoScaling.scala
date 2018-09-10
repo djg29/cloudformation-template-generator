@@ -79,7 +79,7 @@ case class `AWS::ApplicationAutoScaling::ScalableTarget`(name: String,
                                                          ResourceId: Token[String],
                                                          RoleARN: Token[String],
                                                          ScalableDimension: Token[String],
-                                                         ScheduledActions: Option[Seq[ScheduledAction]] = None,
+                                                         ScheduledActions: Option[Seq[ApplicationAutoScaling.ScheduledAction]] = None,
                                                          ServiceNamespace: `AWS::CloudWatch::Alarm::Namespace`,
                                                          override val Condition:  Option[ConditionRef] = None,
                                                          override val DependsOn : Option[Seq[String]] = None)
